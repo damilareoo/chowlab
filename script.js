@@ -3,6 +3,7 @@ class RecipeFinder {
         // Immediate initialization
         this.forceContentVisibility();
         this.initializeDOMElements();
+        this.hideModal();
         this.setupQuickAccess();
         this.initEventListeners();
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
@@ -55,6 +56,20 @@ class RecipeFinder {
         this.photoUploadInput = document.getElementById('recipe-photo-upload');
         this.photoUploadBtn = document.getElementById('photo-upload-btn');
         this.darkModeToggle = document.getElementById('dark-mode-toggle');
+    }
+
+    hideModal() {
+        // Ensure modal is completely hidden
+        if (this.recipeModal) {
+            this.recipeModal.style.display = 'none';
+            this.recipeModal.style.opacity = '0';
+            this.recipeModal.style.visibility = 'hidden';
+            this.recipeModal.classList.add('hidden');
+        }
+
+        if (this.closeModalBtn) {
+            this.closeModalBtn.style.display = 'none';
+        }
     }
 
     initEventListeners() {
