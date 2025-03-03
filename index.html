@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChowLab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <h1>ChowLab</h1>
+            </div>
+            <nav>
+                <div class="photo-cta">
+                    <input type="file" id="recipe-photo-upload" accept="image/*" style="display:none;">
+                    <button id="photo-upload-btn">
+                        <i class="fas fa-camera"></i> Snap Recipe
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h2>Discover Delicious Recipes From Around The World</h2>
+                    <p>Your one-stop destination for exploring global cuisines, finding new recipes, and creating unforgettable culinary experiences.</p>
+                </div>
+            </section>
+
+            <section class="search-section">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search for a meal, country, or ingredient..."
+                    >
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Beef">Beef</option>
+                        <option value="Chicken">Chicken</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Seafood">Seafood</option>
+                        <option value="Vegetarian">Vegetarian</option>
+                    </select>
+                    <button id="search-btn">Find Recipes</button>
+                </div>
+
+                <div id="recipes-container" class="recipes-grid">
+                    <!-- Recipes will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <section id="recipe-modal" class="recipe-modal hidden">
+                <div class="modal-content">
+                    <button id="close-modal-btn">&times;</button>
+                    <div id="recipe-details-container"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 ChowLab | Designed and built by <a href="https://x.com/damilare_oo" target="_blank">Damilare</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
