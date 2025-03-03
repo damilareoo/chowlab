@@ -8,6 +8,14 @@
     --text-secondary: #64748B;      /* Muted slate */
     --white: #FFFFFF;
     
+    /* Responsive Typography Scale */
+    --font-scale: clamp(0.8rem, 2vw, 1rem);
+    
+    /* Breakpoints */
+    --mobile-width: 480px;
+    --tablet-width: 768px;
+    --desktop-width: 1200px;
+    
     /* Typography */
     --font-primary: 'Inter', sans-serif;
 }
@@ -19,6 +27,11 @@
     box-sizing: border-box;
 }
 
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: var(--font-primary);
     background-color: var(--background-color);
@@ -26,12 +39,26 @@ body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-width: 320px;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .app-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 5%;
+}
+
+/* Fluid Typography */
+h1 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+h2 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    line-height: 1.2;
 }
 
 /* Header Styles */
@@ -115,23 +142,28 @@ nav {
 /* Hero Section */
 .hero-section {
     text-align: center;
-    padding: 80px 0;
+    padding: clamp(50px, 10vw, 100px) 0;
     background: linear-gradient(135deg, var(--background-color), rgba(34, 211, 238, 0.05));
 }
 
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 5%;
+}
+
 .hero-content h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 15px;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: clamp(15px, 3vw, 20px);
     color: var(--primary-color);
     animation: fadeInUp 1s ease;
 }
 
 .hero-content p {
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    max-width: 100%;
+    line-height: 1.6;
     color: var(--text-secondary);
-    max-width: 500px;
-    margin: 0 auto;
     animation: fadeInUp 1s ease 0.3s backwards;
 }
 
@@ -156,33 +188,29 @@ nav {
 
 .search-container {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(10px, 2vw, 15px);
     width: 100%;
-    max-width: 700px;
-    gap: 10px;
-    margin-bottom: 30px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 #search-input, 
 #category-filter, 
 #search-btn {
+    flex: 1 1 calc(33% - 15px);
+    min-width: 250px;
+    padding: clamp(10px, 2vw, 15px);
+    font-size: var(--font-scale);
     font-family: var(--font-primary);
-    padding: 12px;
-    font-size: 0.9rem;
     border-radius: 8px;
     border: 1px solid var(--text-secondary);
     transition: all 0.3s ease;
 }
 
-#search-input {
-    flex-grow: 3;
-}
-
-#category-filter {
-    flex-grow: 1;
-}
-
 #search-btn {
-    flex-grow: 1;
+    flex: 1 1 calc(33% - 15px);
     background-color: var(--accent-color);
     color: var(--white);
     border: none;
@@ -198,12 +226,17 @@ nav {
 /* Recipes Grid */
 .recipes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(250px, 25vw, 300px), 1fr));
+    gap: clamp(15px, 3vw, 30px);
     width: 100%;
+    padding: 0 5%;
 }
 
 .recipe-card {
+    width: 100%;
+    aspect-ratio: 3/4;
+    display: flex;
+    flex-direction: column;
     background-color: var(--white);
     border-radius: 12px;
     overflow: hidden;
@@ -219,7 +252,7 @@ nav {
 
 .recipe-card img {
     width: 100%;
-    height: 250px;
+    height: 70%;
     object-fit: cover;
     transition: transform 0.4s ease;
 }
@@ -269,18 +302,19 @@ nav {
     align-items: center;
     z-index: 1000;
     backdrop-filter: blur(5px);
+    padding: 5%;
 }
 
 .modal-content {
     background-color: var(--white);
+    width: 100%;
     max-width: 900px;
-    width: 95%;
     max-height: 90vh;
-    border-radius: 20px;
     overflow-y: auto;
+    padding: clamp(20px, 5vw, 40px);
+    border-radius: 20px;
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
     position: relative;
-    padding: 40px;
     animation: scaleIn 0.4s ease;
 }
 
@@ -339,36 +373,51 @@ footer a:hover {
     color: var(--primary-color);
 }
 
-/* Responsive Design */
+/* Advanced Responsive Techniques */
 @media screen and (max-width: 768px) {
+    .app-container {
+        padding: 0 3%;
+    }
+
     .search-container {
         flex-direction: column;
+        align-items: stretch;
     }
 
     #search-input, 
     #category-filter, 
     #search-btn {
-        width: 100%;
+        flex: 1 1 100%;
+        min-width: 100%;
         margin-bottom: 10px;
     }
 
-    .hero-content h2 {
-        font-size: 2rem;
-    }
-
     .recipes-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        padding: 0;
     }
 }
 
-/* Utility Classes */
-.hidden {
-    display: none !important;
+/* High Resolution Displays */
+@media screen and (min-width: 1920px) {
+    .app-container {
+        max-width: 1600px;
+    }
 }
 
-.message {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 1rem;
-    margin-top: 40px;
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        font-size: 12pt;
+        color: #000;
+        background: #fff;
+    }
 }

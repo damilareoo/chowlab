@@ -6,18 +6,18 @@
     <title>ChowLab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Sora:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container">
         <header>
-            <div class="logo">
+            <div class="logo reveal-on-scroll">
                 <h1>ChowLab</h1>
             </div>
             <nav>
-                <div class="photo-cta">
+                <div class="photo-cta reveal-on-scroll">
                     <input type="file" id="recipe-photo-upload" accept="image/*" style="display:none;">
                     <button id="photo-upload-btn">
                         <i class="fas fa-camera"></i> Snap Recipe
@@ -27,14 +27,14 @@
         </header>
 
         <main>
-            <section class="hero-section">
+            <section class="hero-section reveal-on-scroll">
                 <div class="hero-content">
                     <h2>Discover Delicious Recipes From Around The World</h2>
                     <p>Your one-stop destination for exploring global cuisines, finding new recipes, and creating unforgettable culinary experiences.</p>
                 </div>
             </section>
 
-            <section class="search-section">
+            <section class="search-section reveal-on-scroll">
                 <div class="search-container">
                     <input 
                         type="text" 
@@ -52,7 +52,7 @@
                     <button id="search-btn">Find Recipes</button>
                 </div>
 
-                <div id="recipes-container" class="recipes-grid">
+                <div id="recipes-container" class="recipes-grid reveal-on-scroll">
                     <!-- Recipes will be dynamically loaded here -->
                 </div>
             </section>

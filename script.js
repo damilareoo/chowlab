@@ -14,6 +14,7 @@ class RecipeFinder {
         this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
 
         this.initEventListeners();
+        this.initScrollAnimations();
     }
 
     initEventListeners() {
@@ -87,7 +88,7 @@ class RecipeFinder {
         }
 
         this.recipesContainer.innerHTML = meals.map(meal => `
-            <div class="recipe-card" data-id="${meal.idMeal}">
+            <div class="recipe-card reveal-on-scroll" data-id="${meal.idMeal}">
                 <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
                 <div class="recipe-card-content">
                     <h3>${meal.strMeal}</h3>
@@ -162,7 +163,65 @@ class RecipeFinder {
     displayMessage(message) {
         this.recipesContainer.innerHTML = `<p class="message">${message}</p>`;
     }
+
+    initScrollAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        // Add reveal animations to specific elements
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
+        revealElements.forEach(el => observer.observe(el));
+
+        // Parallax effect for hero section
+        this.initParallaxEffect();
+    }
+
+    initParallaxEffect() {
+        const heroSection = document.querySelector('.hero-section');
+        
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.pageYOffset;
+            heroSection.style.transform = `translateY(${scrollPosition * 0.5}px)`;
+        });
+    }
+
+    initInteractionSounds() {
+        const hoverElements = document.querySelectorAll('button, .recipe-card');
+        const hoverSound = new Audio('path/to/hover-sound.mp3');
+        const clickSound = new Audio('path/to/click-sound.mp3');
+
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                hoverSound.play();
+            });
+
+            el.addEventListener('click', () => {
+                clickSound.play();
+            });
+        });
+    }
 }
 
-// Initialize the app
-const recipeFinder = new RecipeFinder();
+// Initialize the app with additional interactions
+document.addEventListener('DOMContentLoaded', () => {
+    const recipeFinder = new RecipeFinder();
+    
+    // Add cursor trail effect
+    const cursorTrail = document.createElement('div');
+    cursorTrail.classList.add('cursor-trail');
+    document.body.appendChild(cursorTrail);
+
+    document.addEventListener('mousemove', (e) => {
+        cursorTrail.style.left = `${e.clientX}px`;
+        cursorTrail.style.top = `${e.clientY}px`;
+    });
+});
