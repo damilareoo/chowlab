@@ -29,9 +29,6 @@ class RecipeFinder {
             { name: 'categoryFilter', selector: '#category-filter' },
             { name: 'searchBtn', selector: '#search-btn' },
             { name: 'recipesContainer', selector: '#recipes-container' },
-            { name: 'recipeModal', selector: '#recipe-modal' },
-            { name: 'recipeDetailsContainer', selector: '#recipe-details-container' },
-            { name: 'closeModalBtn', selector: '#close-modal-btn' },
             { name: 'photoUploadBtn', selector: '#photo-upload-btn' },
             { name: 'recipePhotoUpload', selector: '#recipe-photo-upload' }
         ];
@@ -45,11 +42,6 @@ class RecipeFinder {
     }
 
     setupEventListeners() {
-        // Null checks before adding event listeners
-        if (this.closeModalBtn) {
-            this.closeModalBtn.addEventListener('click', () => this.hideRecipeModal());
-        }
-
         if (this.photoUploadBtn && this.recipePhotoUpload) {
             this.photoUploadBtn.addEventListener('click', () => this.recipePhotoUpload.click());
         }
@@ -232,86 +224,11 @@ class RecipeFinder {
             <img src="${recipe.strMealThumb}" alt="${recipe.strMeal}" loading="lazy">
             <div class="recipe-card-content">
                 <h3>${this.truncateText(recipe.strMeal, 25)}</h3>
-                <button>View Recipe</button>
+                <p>${recipe.strCategory || 'Unknown Category'}</p>
             </div>
         `;
-
-        card.querySelector('button').addEventListener('click', () => this.showRecipeDetails(recipe.idMeal));
-        
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                this.showRecipeDetails(recipe.idMeal);
-            }
-        });
 
         return card;
-    }
-
-    async showRecipeDetails(mealId) {
-        try {
-            const response = await this.fetchFromAPI(`${this.API_BASE_URL}/lookup.php?i=${mealId}`);
-            const meal = response?.meals?.[0];
-
-            if (meal) {
-                this.displayRecipeModal(meal);
-            } else {
-                this.showErrorMessage('Recipe details not available.');
-            }
-        } catch (error) {
-            console.error('Recipe details error:', error);
-            this.showErrorMessage('Could not load recipe details.');
-        }
-    }
-
-    displayRecipeModal(meal) {
-        if (!this.recipeModal || !this.recipeDetailsContainer) return;
-
-        const ingredients = this.extractIngredients(meal);
-
-        this.recipeDetailsContainer.innerHTML = `
-            <div class="recipe-modal-content">
-                <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="recipe-modal-image">
-                <h2 id="recipe-modal-title">${meal.strMeal}</h2>
-                <div class="recipe-modal-details">
-                    <h3>Ingredients</h3>
-                    <ul>
-                        ${ingredients.map(ing => `<li>${ing}</li>`).join('')}
-                    </ul>
-                    <h3>Instructions</h3>
-                    <p>${meal.strInstructions}</p>
-                    ${meal.strYoutube ? `
-                        <a href="${meal.strYoutube}" 
-                           target="_blank" 
-                           rel="noopener noreferrer" 
-                           class="youtube-link">
-                            Watch Video Tutorial
-                        </a>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-
-        this.recipeModal.classList.remove('hidden');
-        this.recipeModal.setAttribute('aria-hidden', 'false');
-    }
-
-    extractIngredients(meal) {
-        const ingredients = [];
-        for (let i = 1; i <= 20; i++) {
-            const ingredient = meal[`strIngredient${i}`];
-            const measure = meal[`strMeasure${i}`];
-            if (ingredient && ingredient.trim() !== '') {
-                ingredients.push(`${measure} ${ingredient}`.trim());
-            }
-        }
-        return ingredients;
-    }
-
-    hideRecipeModal() {
-        if (this.recipeModal) {
-            this.recipeModal.classList.add('hidden');
-            this.recipeModal.setAttribute('aria-hidden', 'true');
-        }
     }
 
     truncateText(text, length) {
