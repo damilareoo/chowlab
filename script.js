@@ -1,5 +1,9 @@
 class RecipeFinder {
     constructor() {
+        // Ensure immediate content visibility
+        this.removeAnyBlockingElements();
+        
+        // Rest of the existing initialization
         this.searchInput = document.getElementById('search-input');
         this.categoryFilter = document.getElementById('category-filter');
         this.searchBtn = document.getElementById('search-btn');
@@ -14,22 +18,32 @@ class RecipeFinder {
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
         this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
 
-        this.removeBlockingElements();
         this.initEventListeners();
         this.initInteractionSounds();
         this.initDarkMode();
     }
 
-    removeBlockingElements() {
-        const blockers = document.querySelectorAll('.blocking-overlay, .loading-screen');
-        blockers.forEach(blocker => blocker.remove());
+    removeAnyBlockingElements() {
+        // Remove any potential blocking overlays or elements
+        const blockers = [
+            document.querySelector('.blocking-overlay'),
+            document.getElementById('initial-loading-screen'),
+            document.querySelector('.reveal-blocker')
+        ];
 
-        const revealElements = document.querySelectorAll('.reveal-on-scroll');
-        revealElements.forEach(el => {
-            el.classList.remove('hidden');
-            el.classList.add('visible');
+        blockers.forEach(blocker => {
+            if (blocker) {
+                blocker.style.display = 'none';
+                blocker.remove();
+            }
+        });
+
+        // Force visibility of all elements
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
             el.style.opacity = '1';
-            el.style.transform = 'none';
+            el.style.visibility = 'visible';
+            el.classList.remove('hidden');
         });
     }
 
