@@ -9,13 +9,14 @@ class RecipeFinder {
         this.closeModalBtn = document.getElementById('close-modal-btn');
         this.photoUploadInput = document.getElementById('recipe-photo-upload');
         this.photoUploadBtn = document.getElementById('photo-upload-btn');
+        this.darkModeToggle = document.getElementById('dark-mode-toggle');
 
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
         this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
 
         this.initEventListeners();
-        this.initScrollAnimations();
         this.initInteractionSounds();
+        this.initDarkMode();
     }
 
     initEventListeners() {
@@ -172,34 +173,39 @@ class RecipeFinder {
         this.recipesContainer.innerHTML = `<p class="message">${message}</p>`;
     }
 
-    initScrollAnimations() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                } else {
-                    entry.target.classList.remove('active');
-                }
-            });
-        }, {
-            threshold: 0.1
+    initDarkMode() {
+        // Check for user's system preference
+        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Set initial theme
+        document.body.classList.toggle('dark-mode', prefersDarkMode.matches);
+
+        // Add toggle event listener
+        this.darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            this.saveDarkModePreference();
         });
 
-        // Add reveal animations to specific elements
-        const revealElements = document.querySelectorAll('.reveal-on-scroll');
-        revealElements.forEach(el => observer.observe(el));
+        // Listen for system theme changes
+        prefersDarkMode.addListener((e) => {
+            document.body.classList.toggle('dark-mode', e.matches);
+            this.saveDarkModePreference();
+        });
 
-        // Parallax effect for hero section
-        this.initParallaxEffect();
+        // Restore user's previous preference
+        this.restoreDarkModePreference();
     }
 
-    initParallaxEffect() {
-        const heroSection = document.querySelector('.hero-section');
-        
-        window.addEventListener('scroll', () => {
-            const scrollPosition = window.pageYOffset;
-            heroSection.style.transform = `translateY(${scrollPosition * 0.5}px)`;
-        });
+    saveDarkModePreference() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    restoreDarkModePreference() {
+        const savedPreference = localStorage.getItem('darkMode');
+        if (savedPreference !== null) {
+            document.body.classList.toggle('dark-mode', JSON.parse(savedPreference));
+        }
     }
 
     initInteractionSounds() {
