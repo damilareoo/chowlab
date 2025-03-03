@@ -42,6 +42,7 @@ body {
     min-width: 320px;
     width: 100%;
     overflow-x: hidden;
+    overflow: visible !important;
 }
 
 .app-container {
@@ -159,7 +160,11 @@ nav {
     font-size: clamp(2rem, 5vw, 2.5rem);
     margin-bottom: clamp(15px, 3vw, 20px);
     color: var(--primary-color);
-    animation: fadeInUp 1s ease;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    animation: none !important;
+    animation: softFadeIn 0.5s ease-out forwards;
+    animation-delay: 0s;
 }
 
 .hero-content p {
@@ -167,17 +172,21 @@ nav {
     max-width: 100%;
     line-height: 1.6;
     color: var(--text-secondary);
-    animation: fadeInUp 1s ease 0.3s backwards;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    animation: none !important;
+    animation: softFadeIn 0.5s ease-out forwards;
+    animation-delay: 0s;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+@keyframes softFadeIn {
+    from { 
+        opacity: 0.5; 
+        transform: translateY(10px); 
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
     }
 }
 
@@ -329,18 +338,6 @@ nav {
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
     position: relative;
-    animation: scaleIn 0.4s ease;
-}
-
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 #close-modal-btn {
@@ -634,4 +631,9 @@ footer a:hover {
     background-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(15, 23, 42, 0.1);
+}
+
+.reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
 }

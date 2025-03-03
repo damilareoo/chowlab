@@ -14,9 +14,23 @@ class RecipeFinder {
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
         this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
 
+        this.removeBlockingElements();
         this.initEventListeners();
         this.initInteractionSounds();
         this.initDarkMode();
+    }
+
+    removeBlockingElements() {
+        const blockers = document.querySelectorAll('.blocking-overlay, .loading-screen');
+        blockers.forEach(blocker => blocker.remove());
+
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
+        revealElements.forEach(el => {
+            el.classList.remove('hidden');
+            el.classList.add('visible');
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
     }
 
     initEventListeners() {
