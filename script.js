@@ -15,6 +15,7 @@ class RecipeFinder {
 
         this.initEventListeners();
         this.initScrollAnimations();
+        this.initInteractionSounds();
     }
 
     initEventListeners() {
@@ -130,7 +131,14 @@ class RecipeFinder {
                     ${meal.strYoutube ? `
                         <div class="recipe-video">
                             <h3>Video Tutorial</h3>
-                            <a href="${meal.strYoutube}" target="_blank">Watch on YouTube</a>
+                            <a href="${meal.strYoutube}" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               onclick="this.classList.add('clicked')"
+                               onmouseover="this.classList.add('hover')"
+                               onmouseout="this.classList.remove('hover')">
+                                Watch on YouTube
+                            </a>
                         </div>
                     ` : ''}
                 </div>
@@ -195,17 +203,19 @@ class RecipeFinder {
     }
 
     initInteractionSounds() {
-        const hoverElements = document.querySelectorAll('button, .recipe-card');
-        const hoverSound = new Audio('path/to/hover-sound.mp3');
-        const clickSound = new Audio('path/to/click-sound.mp3');
+        const hoverElements = document.querySelectorAll('button, .recipe-card, a');
+        const hoverSound = new Audio('hover-sound.mp3');
+        const clickSound = new Audio('click-sound.mp3');
 
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
-                hoverSound.play();
+                hoverSound.currentTime = 0;
+                hoverSound.play().catch(e => console.log('Sound play error:', e));
             });
 
             el.addEventListener('click', () => {
-                clickSound.play();
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => console.log('Sound play error:', e));
             });
         });
     }
