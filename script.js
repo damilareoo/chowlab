@@ -1,43 +1,50 @@
 class RecipeFinder {
     constructor() {
-        this.initializeApp();
-    }
-
-    initializeApp() {
-        // Ensure immediate content visibility
-        this.removeBlockingElements();
-        
-        // Initialize core components
-        this.initDOMElements();
+        // Immediate initialization
+        this.forceContentVisibility();
+        this.initializeDOMElements();
+        this.setupQuickAccess();
         this.initEventListeners();
-        this.initializeContentVisibility();
-        
-        // Rest of the existing initialization
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
         this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
-
         this.initInteractionSounds();
         this.initDarkMode();
     }
 
-    removeBlockingElements() {
-        // Aggressively remove any potential blocking elements
-        const blockers = [
-            document.querySelector('.blocking-overlay'),
-            document.getElementById('initial-loading-screen'),
-            document.querySelector('.reveal-blocker')
+    forceContentVisibility() {
+        // Aggressive visibility enforcement
+        document.body.style.opacity = '1';
+        document.body.style.visibility = 'visible';
+        
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+            el.style.transform = 'none';
+            el.classList.remove('hidden');
+        });
+    }
+
+    setupQuickAccess() {
+        // Ensure immediate interactivity
+        const interactiveElements = [
+            'search-input', 
+            'category-filter', 
+            'search-btn', 
+            'photo-upload-btn'
         ];
 
-        blockers.forEach(blocker => {
-            if (blocker) {
-                blocker.style.display = 'none';
-                blocker.remove();
+        interactiveElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.disabled = false;
+                element.style.pointerEvents = 'auto';
             }
         });
     }
 
-    initDOMElements() {
-        // Safely get DOM elements
+    initializeDOMElements() {
+        // Safely initialize DOM references
         this.searchInput = document.getElementById('search-input');
         this.categoryFilter = document.getElementById('category-filter');
         this.searchBtn = document.getElementById('search-btn');
@@ -48,23 +55,6 @@ class RecipeFinder {
         this.photoUploadInput = document.getElementById('recipe-photo-upload');
         this.photoUploadBtn = document.getElementById('photo-upload-btn');
         this.darkModeToggle = document.getElementById('dark-mode-toggle');
-    }
-
-    initializeContentVisibility() {
-        // Force visibility of all elements
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(el => {
-            el.style.opacity = '1';
-            el.style.visibility = 'visible';
-            el.classList.remove('hidden');
-        });
-
-        // Ensure loading overlay is removed
-        const loadingOverlay = document.getElementById('loading-overlay');
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-            setTimeout(() => loadingOverlay.remove(), 300);
-        }
     }
 
     initEventListeners() {
@@ -138,7 +128,7 @@ class RecipeFinder {
         }
 
         this.recipesContainer.innerHTML = meals.map(meal => `
-            <div class="recipe-card reveal-on-scroll" data-id="${meal.idMeal}">
+            <div class="recipe-card" data-id="${meal.idMeal}">
                 <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
                 <div class="recipe-card-content">
                     <h3>${meal.strMeal}</h3>

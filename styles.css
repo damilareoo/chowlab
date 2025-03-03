@@ -26,14 +26,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: none !important;
 }
 
 html, body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden !important;
-    overflow: visible !important;
     position: static !important;
 }
 
@@ -47,7 +45,6 @@ body {
     min-width: 320px;
     width: 100%;
     overflow-x: hidden;
-    overflow: visible !important;
 }
 
 /* Responsive Container */
@@ -150,18 +147,16 @@ nav {
     font-size: var(--font-scale-mobile);
     max-width: 100%;
     text-align: center;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
+    animation: quickFadeIn 0.2s ease-out forwards;
+    animation-delay: 0s;
 }
 
 .hero-content p {
     font-size: var(--font-scale-mobile);
     max-width: 100%;
     text-align: center;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
+    animation: quickFadeIn 0.2s ease-out forwards;
+    animation-delay: 0s;
 }
 
 /* Search Section */
@@ -342,50 +337,55 @@ footer a {
     }
 }
 
-/* Loading Overlay Styles */
-#loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--background-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 0.3s ease-out;
+/* Absolute Visibility Enforcement */
+* {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
 }
 
-#loading-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid var(--accent-color);
-    border-top: 3px solid var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Ensure No Blocking Elements */
-body, html {
+body, html, .app-container {
+    opacity: 1 !important;
+    visibility: visible !important;
     overflow: visible !important;
+    position: static !important;
     max-height: none !important;
 }
 
-.reveal-on-scroll {
+/* Minimal, Non-Blocking Entrance Animation */
+@keyframes quickFadeIn {
+    from { 
+        opacity: 0.9; 
+        transform: translateY(3px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Optional Soft Entrance for Key Elements */
+.hero-content h2,
+.hero-content p {
+    animation: quickFadeIn 0.2s ease-out forwards;
+    animation-delay: 0s;
+}
+
+/* Responsive Adjustments */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Ensure Interactive Elements are Accessible */
+#search-input, 
+#category-filter, 
+#search-btn,
+#photo-upload-btn {
+    pointer-events: auto !important;
     opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
 }

@@ -9,18 +9,38 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background-color: var(--background-color);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
+            opacity: 1;
             transition: opacity 0.3s ease-out;
         }
-        #loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
+
+        #loading-percentage {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        #loading-bar {
+            width: 300px;
+            height: 10px;
+            background-color: rgba(34, 211, 238, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #loading-bar-fill {
+            width: 0;
+            height: 100%;
+            background-color: var(--accent-color);
+            transition: width 0.5s ease;
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,10 +51,13 @@
 </head>
 <body>
     <div id="loading-overlay">
-        <div class="spinner">Loading...</div>
+        <div id="loading-percentage">0%</div>
+        <div id="loading-bar">
+            <div id="loading-bar-fill"></div>
+        </div>
     </div>
 
-    <div class="app-container">
+    <div class="app-container" style="opacity: 0; visibility: hidden;">
         <header>
             <div class="logo reveal-on-scroll">
                 <h1>ChowLab</h1>
@@ -94,15 +117,39 @@
     </div>
 
     <script>
-        // Remove loading overlay as soon as possible
         document.addEventListener('DOMContentLoaded', () => {
             const loadingOverlay = document.getElementById('loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.classList.add('hidden');
-                setTimeout(() => {
-                    loadingOverlay.remove();
-                }, 300);
+            const loadingPercentage = document.getElementById('loading-percentage');
+            const loadingBarFill = document.getElementById('loading-bar-fill');
+            const appContainer = document.querySelector('.app-container');
+
+            function simulateLoading() {
+                let progress = 0;
+                const startTime = Date.now();
+                const maxLoadTime = 2000; // 2 seconds max loading time
+
+                const interval = setInterval(() => {
+                    const elapsedTime = Date.now() - startTime;
+                    progress = Math.min((elapsedTime / maxLoadTime) * 100, 100);
+                    
+                    loadingPercentage.textContent = `${Math.round(progress)}%`;
+                    loadingBarFill.style.width = `${progress}%`;
+
+                    // Reveal app container at 50% progress
+                    if (progress >= 50) {
+                        appContainer.style.opacity = '1';
+                        appContainer.style.visibility = 'visible';
+                    }
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        loadingOverlay.classList.add('hidden');
+                        setTimeout(() => loadingOverlay.remove(), 300);
+                    }
+                }, 20);
             }
+
+            simulateLoading();
         });
     </script>
     <script src="script.js"></script>
