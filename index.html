@@ -3,155 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ChowLab: Discover global recipes, explore cuisines, and cook delicious meals from around the world.">
+    <meta name="keywords" content="recipes, cooking, global cuisine, food discovery, meal ideas">
     <title>ChowLab</title>
-    <style>
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--background-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.3s ease-out;
-        }
-
-        #loading-percentage {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        #loading-bar {
-            width: 300px;
-            height: 10px;
-            background-color: rgba(34, 211, 238, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        #loading-bar-fill {
-            width: 0;
-            height: 100%;
-            background-color: var(--accent-color);
-            transition: width 0.5s ease;
-        }
-    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Sora:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="https://img.icons8.com/fluency/96/chef-hat.png" type="image/png">
 </head>
 <body>
-    <div id="loading-overlay">
-        <div id="loading-percentage">0%</div>
-        <div id="loading-bar">
-            <div id="loading-bar-fill"></div>
-        </div>
-    </div>
-
-    <div class="app-container" style="opacity: 0; visibility: hidden;">
-        <header>
-            <div class="logo reveal-on-scroll">
-                <h1>ChowLab</h1>
+    <div class="app-container" role="main">
+        <header role="banner">
+            <div class="logo reveal-on-scroll" aria-label="ChowLab Logo">
+                <div class="logo-icon-wrapper" aria-hidden="true">
+                    <i class="fas fa-utensils logo-icon"></i>
+                </div>
+                <h1 class="logo-text">ChowLab</h1>
             </div>
-            <nav>
+            <nav role="navigation">
                 <div class="photo-cta reveal-on-scroll">
-                    <input type="file" id="recipe-photo-upload" accept="image/*" style="display:none;">
-                    <button id="photo-upload-btn">
-                        <i class="fas fa-camera"></i> Snap Recipe
+                    <input 
+                        type="file" 
+                        id="recipe-photo-upload" 
+                        accept="image/*" 
+                        style="display:none;" 
+                        aria-label="Upload recipe photo"
+                    >
+                    <button 
+                        id="photo-upload-btn" 
+                        aria-label="Upload Recipe Photo"
+                    >
+                        <i class="fas fa-camera" aria-hidden="true"></i> Snap Recipe
                     </button>
                 </div>
             </nav>
         </header>
 
         <main>
-            <section class="hero-section reveal-on-scroll">
+            <section class="hero-section reveal-on-scroll" aria-labelledby="hero-title">
                 <div class="hero-content">
-                    <h2>Discover Delicious Recipes From Around The World</h2>
-                    <p>Your one-stop destination for exploring global cuisines, finding new recipes, and creating unforgettable culinary experiences.</p>
+                    <h2 id="hero-title">Discover Culinary Wonders Worldwide</h2>
+                    <p>Explore, Cook, and Savor Authentic Recipes from Every Corner of the Globe</p>
                 </div>
             </section>
 
-            <section class="search-section reveal-on-scroll">
-                <div class="search-container">
-                    <input 
-                        type="text" 
-                        id="search-input" 
-                        placeholder="Search for a meal, country, or ingredient..."
-                    >
-                    <select id="category-filter">
-                        <option value="">All Categories</option>
-                        <option value="Beef">Beef</option>
-                        <option value="Chicken">Chicken</option>
-                        <option value="Dessert">Dessert</option>
-                        <option value="Seafood">Seafood</option>
-                        <option value="Vegetarian">Vegetarian</option>
-                    </select>
-                    <button id="search-btn">Find Recipes</button>
+            <section class="search-section reveal-on-scroll" aria-labelledby="search-heading">
+                <h2 id="search-heading" class="visually-hidden">Recipe Search</h2>
+                <div class="search-wrapper">
+                    <div class="search-container">
+                        <div class="search-icon-wrapper" aria-hidden="true">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Find a recipe: Sushi, Pasta, Tacos..."
+                            class="global-search-input"
+                            aria-label="Search recipes"
+                            autocomplete="off"
+                        >
+                        <select 
+                            id="category-filter" 
+                            class="category-dropdown"
+                            aria-label="Select cuisine category"
+                        >
+                            <option value="">All Cuisines</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Chicken">Chicken</option>
+                            <option value="Dessert">Dessert</option>
+                            <option value="Beef">Beef</option>
+                        </select>
+                        <button 
+                            id="search-btn" 
+                            class="search-cta"
+                            aria-label="Search Recipes"
+                        >
+                            <span>Explore Recipes</span>
+                            <i class="fas fa-utensils" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div id="recipes-container" class="recipes-grid reveal-on-scroll">
+                <div 
+                    id="recipes-container" 
+                    class="recipes-grid reveal-on-scroll" 
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
                     <!-- Recipes will be dynamically loaded here -->
                 </div>
             </section>
 
-            <section id="recipe-modal" class="recipe-modal hidden">
+            <section 
+                id="recipe-modal" 
+                class="recipe-modal hidden" 
+                role="dialog" 
+                aria-modal="true"
+                aria-labelledby="recipe-modal-title"
+            >
                 <div class="modal-content">
-                    <button id="close-modal-btn">&times;</button>
-                    <div id="recipe-details-container"></div>
+                    <button 
+                        id="close-modal-btn" 
+                        aria-label="Close Recipe Details"
+                    >&times;</button>
+                    <div 
+                        id="recipe-details-container"
+                        aria-live="polite"
+                    ></div>
                 </div>
             </section>
         </main>
 
-        <footer>
-            <p>&copy; 2025 ChowLab | Designed and built by <a href="https://x.com/damilare_oo" target="_blank">Damilare</a></p>
+        <footer role="contentinfo">
+            <p>&copy; 2025 ChowLab | Designed and built by <a href="https://x.com/damilare_oo" target="_blank" rel="noopener noreferrer">Damilare</a></p>
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const loadingPercentage = document.getElementById('loading-percentage');
-            const loadingBarFill = document.getElementById('loading-bar-fill');
-            const appContainer = document.querySelector('.app-container');
-
-            function simulateLoading() {
-                let progress = 0;
-                const startTime = Date.now();
-                const maxLoadTime = 2000; // 2 seconds max loading time
-
-                const interval = setInterval(() => {
-                    const elapsedTime = Date.now() - startTime;
-                    progress = Math.min((elapsedTime / maxLoadTime) * 100, 100);
-                    
-                    loadingPercentage.textContent = `${Math.round(progress)}%`;
-                    loadingBarFill.style.width = `${progress}%`;
-
-                    // Reveal app container at 50% progress
-                    if (progress >= 50) {
-                        appContainer.style.opacity = '1';
-                        appContainer.style.visibility = 'visible';
-                    }
-
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        loadingOverlay.classList.add('hidden');
-                        setTimeout(() => loadingOverlay.remove(), 300);
-                    }
-                }, 20);
-            }
-
-            simulateLoading();
-        });
-    </script>
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

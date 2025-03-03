@@ -1,208 +1,298 @@
 class RecipeFinder {
     constructor() {
-        // Immediate initialization
-        this.forceContentVisibility();
-        this.initializeDOMElements();
-        this.hideModal();
-        this.setupQuickAccess();
-        this.initEventListeners();
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
-        this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
-        this.initInteractionSounds();
-        this.initDarkMode();
-    }
-
-    forceContentVisibility() {
-        // Aggressive visibility enforcement
-        document.body.style.opacity = '1';
-        document.body.style.visibility = 'visible';
+        this.MAX_RETRIES = 3;
+        this.RETRY_DELAY = 1000;
         
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(el => {
-            el.style.opacity = '1';
-            el.style.visibility = 'visible';
-            el.style.transform = 'none';
-            el.classList.remove('hidden');
-        });
+        // Ensure DOM is fully loaded before initialization
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initialize());
+        } else {
+            this.initialize();
+        }
     }
 
-    setupQuickAccess() {
-        // Ensure immediate interactivity
-        const interactiveElements = [
-            'search-input', 
-            'category-filter', 
-            'search-btn', 
-            'photo-upload-btn'
-        ];
-
-        interactiveElements.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.disabled = false;
-                element.style.pointerEvents = 'auto';
-            }
-        });
+    initialize() {
+        try {
+            this.initializeDOMElements();
+            this.setupEventListeners();
+            this.setupNetworkStatusTracking();
+            this.safeLoadInitialRecipes();
+        } catch (error) {
+            this.handleCriticalError('App initialization failed', error);
+        }
     }
 
     initializeDOMElements() {
-        // Safely initialize DOM references
-        this.searchInput = document.getElementById('search-input');
-        this.categoryFilter = document.getElementById('category-filter');
-        this.searchBtn = document.getElementById('search-btn');
-        this.recipesContainer = document.getElementById('recipes-container');
-        this.recipeModal = document.getElementById('recipe-modal');
-        this.recipeDetailsContainer = document.getElementById('recipe-details-container');
-        this.closeModalBtn = document.getElementById('close-modal-btn');
-        this.photoUploadInput = document.getElementById('recipe-photo-upload');
-        this.photoUploadBtn = document.getElementById('photo-upload-btn');
-        this.darkModeToggle = document.getElementById('dark-mode-toggle');
-    }
+        const requiredElements = [
+            { name: 'searchInput', selector: '#search-input' },
+            { name: 'categoryFilter', selector: '#category-filter' },
+            { name: 'searchBtn', selector: '#search-btn' },
+            { name: 'recipesContainer', selector: '#recipes-container' },
+            { name: 'recipeModal', selector: '#recipe-modal' },
+            { name: 'recipeDetailsContainer', selector: '#recipe-details-container' },
+            { name: 'closeModalBtn', selector: '#close-modal-btn' },
+            { name: 'photoUploadBtn', selector: '#photo-upload-btn' },
+            { name: 'recipePhotoUpload', selector: '#recipe-photo-upload' }
+        ];
 
-    hideModal() {
-        // Ensure modal is completely hidden
-        if (this.recipeModal) {
-            this.recipeModal.style.display = 'none';
-            this.recipeModal.style.opacity = '0';
-            this.recipeModal.style.visibility = 'hidden';
-            this.recipeModal.classList.add('hidden');
-        }
-
-        if (this.closeModalBtn) {
-            this.closeModalBtn.style.display = 'none';
-        }
-    }
-
-    initEventListeners() {
-        this.searchBtn.addEventListener('click', () => this.searchRecipes());
-        this.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.searchRecipes();
-        });
-        this.closeModalBtn.addEventListener('click', () => this.closeRecipeModal());
-        
-        // Photo Upload Functionality
-        this.photoUploadBtn.addEventListener('click', () => this.photoUploadInput.click());
-        this.photoUploadInput.addEventListener('change', (e) => this.handlePhotoUpload(e));
-    }
-
-    async searchRecipes() {
-        const query = this.searchInput.value.trim();
-        const category = this.categoryFilter.value;
-
-        try {
-            let response;
-            if (query) {
-                response = await fetch(`${this.API_BASE_URL}/search.php?s=${query}`);
-            } else if (category) {
-                response = await fetch(`${this.API_BASE_URL}/filter.php?c=${category}`);
-            } else {
-                this.displayMessage('Please enter a search term or select a category');
-                return;
+        requiredElements.forEach(element => {
+            this[element.name] = document.querySelector(element.selector);
+            if (!this[element.name]) {
+                throw new Error(`Element not found: ${element.selector}`);
             }
+        });
+    }
 
-            const data = await response.json();
-            const meals = data.meals || [];
+    setupEventListeners() {
+        // Null checks before adding event listeners
+        if (this.closeModalBtn) {
+            this.closeModalBtn.addEventListener('click', () => this.hideRecipeModal());
+        }
 
-            this.displayRecipes(meals);
-        } catch (error) {
-            console.error('Error fetching recipes:', error);
-            this.displayMessage('Failed to fetch recipes. Please try again.');
+        if (this.photoUploadBtn && this.recipePhotoUpload) {
+            this.photoUploadBtn.addEventListener('click', () => this.recipePhotoUpload.click());
+        }
+
+        if (this.searchBtn) {
+            this.searchBtn.addEventListener('click', () => this.searchRecipes());
+        }
+
+        if (this.searchInput) {
+            this.searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.searchRecipes();
+            });
+        }
+
+        if (this.recipePhotoUpload) {
+            this.recipePhotoUpload.addEventListener('change', this.handlePhotoUpload.bind(this));
         }
     }
 
     handlePhotoUpload(event) {
         const file = event.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    // Simulate image recognition (replace with actual API call)
-                    const recognizedIngredients = await this.recognizeIngredients(e.target.result);
-                    this.searchInput.value = recognizedIngredients.join(', ');
-                    this.searchRecipes();
-                } catch (error) {
-                    console.error('Image recognition error:', error);
-                    this.displayMessage('Failed to recognize ingredients. Please try again.');
-                }
-            };
-            reader.readAsDataURL(file);
+            // Basic file type validation
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                this.showErrorMessage('Invalid file type. Please upload an image.');
+                return;
+            }
+
+            // File size validation (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                this.showErrorMessage('File is too large. Maximum 5MB allowed.');
+                return;
+            }
+
+            this.showErrorMessage('Photo upload coming soon! We\'re working on AI recipe recognition.');
         }
     }
 
-    async recognizeIngredients(imageData) {
-        // Placeholder for image recognition API
-        // In a real-world scenario, you would use a service like Google Cloud Vision, 
-        // Clarifai, or a custom machine learning model
-        const mockIngredients = ['chicken', 'tomato', 'onion'];
-        return mockIngredients;
+    setupNetworkStatusTracking() {
+        window.addEventListener('online', () => this.handleNetworkStatus(true));
+        window.addEventListener('offline', () => this.handleNetworkStatus(false));
     }
 
-    displayRecipes(meals) {
-        if (!meals || meals.length === 0) {
-            this.recipesContainer.innerHTML = '<p class="message">No recipes found.</p>';
+    handleNetworkStatus(isOnline) {
+        const existingBanner = document.querySelector('.network-status-banner');
+        if (existingBanner) {
+            existingBanner.remove();
+        }
+
+        if (!isOnline) {
+            const networkBanner = document.createElement('div');
+            networkBanner.classList.add('network-status-banner', 'network-offline');
+            networkBanner.textContent = 'No internet connection. Please check your network.';
+            document.body.appendChild(networkBanner);
+        }
+    }
+
+    async safeLoadInitialRecipes() {
+        try {
+            await this.loadInitialRecipes();
+        } catch (error) {
+            console.error('Initial recipes load failed:', error);
+            this.showErrorMessage('Unable to load initial recipes. Please refresh the page.');
+        }
+    }
+
+    async loadInitialRecipes() {
+        const initialCategories = ['Seafood', 'Vegetarian', 'Chicken'];
+        const allInitialRecipes = [];
+
+        for (const category of initialCategories) {
+            try {
+                const response = await this.fetchFromAPI(`${this.API_BASE_URL}/filter.php?c=${category}`);
+                if (response?.meals) {
+                    allInitialRecipes.push(...response.meals.slice(0, 3));
+                }
+            } catch (error) {
+                console.warn(`Error loading ${category} recipes:`, error);
+            }
+        }
+
+        this.displayRecipes(allInitialRecipes);
+    }
+
+    async fetchFromAPI(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('API fetch error:', error);
+            throw error;
+        }
+    }
+
+    async searchRecipes() {
+        const query = this.sanitizeInput(this.searchInput.value);
+        const category = this.categoryFilter.value;
+
+        if (!query && !category) {
+            this.showErrorMessage('Please enter a recipe or select a category.');
             return;
         }
 
-        this.recipesContainer.innerHTML = meals.map(meal => `
-            <div class="recipe-card" data-id="${meal.idMeal}">
-                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-                <div class="recipe-card-content">
-                    <h3>${meal.strMeal}</h3>
-                    <button onclick="recipeFinder.showRecipeDetails('${meal.idMeal}')">View Recipe</button>
-                </div>
+        try {
+            const recipes = await this.fetchRecipes(query, category);
+            this.displayRecipes(recipes);
+        } catch (error) {
+            this.handleSearchError(error);
+        }
+    }
+
+    sanitizeInput(input) {
+        // Prevent XSS and trim whitespace
+        return input.replace(/[<>&"']/g, '').trim();
+    }
+
+    async fetchRecipes(query, category) {
+        try {
+            let recipes = [];
+            if (query) {
+                const [nameResults, ingredientResults] = await Promise.all([
+                    this.fetchFromAPI(`${this.API_BASE_URL}/search.php?s=${query}`),
+                    this.fetchFromAPI(`${this.API_BASE_URL}/filter.php?i=${query}`)
+                ]);
+
+                recipes = [
+                    ...(nameResults?.meals || []),
+                    ...(ingredientResults?.meals || [])
+                ];
+            } else if (category) {
+                const categoryResults = await this.fetchFromAPI(`${this.API_BASE_URL}/filter.php?c=${category}`);
+                recipes = categoryResults?.meals || [];
+            }
+
+            // Remove duplicates and limit results
+            return Array.from(
+                new Set(recipes.map(r => r.idMeal))
+            )
+            .map(id => recipes.find(r => r.idMeal === id))
+            .slice(0, 12);
+        } catch (error) {
+            console.error('Recipe fetch error:', error);
+            throw error;
+        }
+    }
+
+    displayRecipes(recipes) {
+        if (!this.recipesContainer) return;
+
+        this.recipesContainer.innerHTML = '';
+        
+        if (!recipes || recipes.length === 0) {
+            this.showErrorMessage('No recipes found. Try a different search.');
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        recipes.forEach(recipe => {
+            const recipeCard = this.createRecipeCard(recipe);
+            fragment.appendChild(recipeCard);
+        });
+
+        this.recipesContainer.appendChild(fragment);
+    }
+
+    createRecipeCard(recipe) {
+        if (!recipe) return document.createElement('div');
+
+        const card = document.createElement('div');
+        card.classList.add('recipe-card');
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', `View ${recipe.strMeal} recipe`);
+        
+        card.innerHTML = `
+            <img src="${recipe.strMealThumb}" alt="${recipe.strMeal}" loading="lazy">
+            <div class="recipe-card-content">
+                <h3>${this.truncateText(recipe.strMeal, 25)}</h3>
+                <button>View Recipe</button>
             </div>
-        `).join('');
+        `;
+
+        card.querySelector('button').addEventListener('click', () => this.showRecipeDetails(recipe.idMeal));
+        
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                this.showRecipeDetails(recipe.idMeal);
+            }
+        });
+
+        return card;
     }
 
     async showRecipeDetails(mealId) {
         try {
-            const response = await fetch(`${this.API_BASE_URL}/lookup.php?i=${mealId}`);
-            const data = await response.json();
-            const meal = data.meals[0];
+            const response = await this.fetchFromAPI(`${this.API_BASE_URL}/lookup.php?i=${mealId}`);
+            const meal = response?.meals?.[0];
 
-            if (!meal) {
-                this.displayMessage('Recipe details not found');
-                return;
+            if (meal) {
+                this.displayRecipeModal(meal);
+            } else {
+                this.showErrorMessage('Recipe details not available.');
             }
+        } catch (error) {
+            console.error('Recipe details error:', error);
+            this.showErrorMessage('Could not load recipe details.');
+        }
+    }
 
-            const ingredients = this.extractIngredients(meal);
+    displayRecipeModal(meal) {
+        if (!this.recipeModal || !this.recipeDetailsContainer) return;
 
-            this.recipeDetailsContainer.innerHTML = `
-                <div class="recipe-header">
-                    <h2>${meal.strMeal}</h2>
-                    <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-                </div>
-                <div class="recipe-details">
-                    <div class="recipe-ingredients">
-                        <h3>Ingredients</h3>
-                        <ul>
-                            ${ingredients.map(ing => `<li>${ing}</li>`).join('')}
-                        </ul>
-                    </div>
-                    <div class="recipe-instructions">
-                        <h3>Instructions</h3>
-                        <p>${meal.strInstructions}</p>
-                    </div>
+        const ingredients = this.extractIngredients(meal);
+
+        this.recipeDetailsContainer.innerHTML = `
+            <div class="recipe-modal-content">
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class="recipe-modal-image">
+                <h2 id="recipe-modal-title">${meal.strMeal}</h2>
+                <div class="recipe-modal-details">
+                    <h3>Ingredients</h3>
+                    <ul>
+                        ${ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                    </ul>
+                    <h3>Instructions</h3>
+                    <p>${meal.strInstructions}</p>
                     ${meal.strYoutube ? `
-                        <div class="recipe-video">
-                            <h3>Video Tutorial</h3>
-                            <a href="${meal.strYoutube}" 
-                               target="_blank" 
-                               rel="noopener noreferrer"
-                               onclick="this.classList.add('clicked')"
-                               onmouseover="this.classList.add('hover')"
-                               onmouseout="this.classList.remove('hover')">
-                                Watch on YouTube
-                            </a>
-                        </div>
+                        <a href="${meal.strYoutube}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="youtube-link">
+                            Watch Video Tutorial
+                        </a>
                     ` : ''}
                 </div>
-            `;
+            </div>
+        `;
 
-            this.recipeModal.classList.remove('hidden');
-        } catch (error) {
-            console.error('Error fetching recipe details:', error);
-            this.displayMessage('Failed to fetch recipe details');
-        }
+        this.recipeModal.classList.remove('hidden');
+        this.recipeModal.setAttribute('aria-hidden', 'false');
     }
 
     extractIngredients(meal) {
@@ -210,87 +300,62 @@ class RecipeFinder {
         for (let i = 1; i <= 20; i++) {
             const ingredient = meal[`strIngredient${i}`];
             const measure = meal[`strMeasure${i}`];
-            
             if (ingredient && ingredient.trim() !== '') {
-                ingredients.push(`${measure ? measure + ' ' : ''}${ingredient}`);
+                ingredients.push(`${measure} ${ingredient}`.trim());
             }
         }
         return ingredients;
     }
 
-    closeRecipeModal() {
-        this.recipeModal.classList.add('hidden');
-    }
-
-    displayMessage(message) {
-        this.recipesContainer.innerHTML = `<p class="message">${message}</p>`;
-    }
-
-    initDarkMode() {
-        // Check for user's system preference
-        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
-        
-        // Set initial theme
-        document.body.classList.toggle('dark-mode', prefersDarkMode.matches);
-
-        // Add toggle event listener
-        this.darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            this.saveDarkModePreference();
-        });
-
-        // Listen for system theme changes
-        prefersDarkMode.addListener((e) => {
-            document.body.classList.toggle('dark-mode', e.matches);
-            this.saveDarkModePreference();
-        });
-
-        // Restore user's previous preference
-        this.restoreDarkModePreference();
-    }
-
-    saveDarkModePreference() {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        localStorage.setItem('darkMode', isDarkMode);
-    }
-
-    restoreDarkModePreference() {
-        const savedPreference = localStorage.getItem('darkMode');
-        if (savedPreference !== null) {
-            document.body.classList.toggle('dark-mode', JSON.parse(savedPreference));
+    hideRecipeModal() {
+        if (this.recipeModal) {
+            this.recipeModal.classList.add('hidden');
+            this.recipeModal.setAttribute('aria-hidden', 'true');
         }
     }
 
-    initInteractionSounds() {
-        const hoverElements = document.querySelectorAll('button, .recipe-card, a');
-        const hoverSound = new Audio('hover-sound.mp3');
-        const clickSound = new Audio('click-sound.mp3');
+    truncateText(text, length) {
+        return text && text.length > length 
+            ? text.substring(0, length) + '...' 
+            : text || '';
+    }
 
-        hoverElements.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                hoverSound.currentTime = 0;
-                hoverSound.play().catch(e => console.log('Sound play error:', e));
-            });
+    showErrorMessage(message) {
+        if (this.recipesContainer) {
+            this.recipesContainer.innerHTML = `
+                <div class="error-message" role="alert">
+                    ${message}
+                </div>
+            `;
+        }
+    }
 
-            el.addEventListener('click', () => {
-                clickSound.currentTime = 0;
-                clickSound.play().catch(e => console.log('Sound play error:', e));
-            });
-        });
+    handleSearchError(error) {
+        console.error('Search error:', error);
+        this.showErrorMessage(
+            navigator.onLine 
+                ? 'Unable to find recipes. Please try a different search.' 
+                : 'No internet connection. Please check your network.'
+        );
+    }
+
+    handleCriticalError(message, error) {
+        console.error(message, error);
+        if (document.body) {
+            document.body.innerHTML = `
+                <div class="critical-error">
+                    <h1>Oops! Something went wrong</h1>
+                    <p>${message}</p>
+                    <button onclick="location.reload()">Reload App</button>
+                </div>
+            `;
+        }
     }
 }
 
-// Initialize the app with additional interactions
-document.addEventListener('DOMContentLoaded', () => {
+// Safe initialization
+try {
     const recipeFinder = new RecipeFinder();
-    
-    // Add cursor trail effect
-    const cursorTrail = document.createElement('div');
-    cursorTrail.classList.add('cursor-trail');
-    document.body.appendChild(cursorTrail);
-
-    document.addEventListener('mousemove', (e) => {
-        cursorTrail.style.left = `${e.clientX}px`;
-        cursorTrail.style.top = `${e.clientY}px`;
-    });
-});
+} catch (error) {
+    console.error('Failed to initialize RecipeFinder:', error);
+}
