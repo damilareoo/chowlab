@@ -1,30 +1,27 @@
 class RecipeFinder {
     constructor() {
+        this.initializeApp();
+    }
+
+    initializeApp() {
         // Ensure immediate content visibility
-        this.removeAnyBlockingElements();
+        this.removeBlockingElements();
+        
+        // Initialize core components
+        this.initDOMElements();
+        this.initEventListeners();
+        this.initializeContentVisibility();
         
         // Rest of the existing initialization
-        this.searchInput = document.getElementById('search-input');
-        this.categoryFilter = document.getElementById('category-filter');
-        this.searchBtn = document.getElementById('search-btn');
-        this.recipesContainer = document.getElementById('recipes-container');
-        this.recipeModal = document.getElementById('recipe-modal');
-        this.recipeDetailsContainer = document.getElementById('recipe-details-container');
-        this.closeModalBtn = document.getElementById('close-modal-btn');
-        this.photoUploadInput = document.getElementById('recipe-photo-upload');
-        this.photoUploadBtn = document.getElementById('photo-upload-btn');
-        this.darkModeToggle = document.getElementById('dark-mode-toggle');
-
         this.API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
         this.IMAGE_RECOGNITION_API = 'YOUR_IMAGE_RECOGNITION_API_KEY'; // Replace with actual API
 
-        this.initEventListeners();
         this.initInteractionSounds();
         this.initDarkMode();
     }
 
-    removeAnyBlockingElements() {
-        // Remove any potential blocking overlays or elements
+    removeBlockingElements() {
+        // Aggressively remove any potential blocking elements
         const blockers = [
             document.querySelector('.blocking-overlay'),
             document.getElementById('initial-loading-screen'),
@@ -37,7 +34,23 @@ class RecipeFinder {
                 blocker.remove();
             }
         });
+    }
 
+    initDOMElements() {
+        // Safely get DOM elements
+        this.searchInput = document.getElementById('search-input');
+        this.categoryFilter = document.getElementById('category-filter');
+        this.searchBtn = document.getElementById('search-btn');
+        this.recipesContainer = document.getElementById('recipes-container');
+        this.recipeModal = document.getElementById('recipe-modal');
+        this.recipeDetailsContainer = document.getElementById('recipe-details-container');
+        this.closeModalBtn = document.getElementById('close-modal-btn');
+        this.photoUploadInput = document.getElementById('recipe-photo-upload');
+        this.photoUploadBtn = document.getElementById('photo-upload-btn');
+        this.darkModeToggle = document.getElementById('dark-mode-toggle');
+    }
+
+    initializeContentVisibility() {
         // Force visibility of all elements
         const allElements = document.querySelectorAll('*');
         allElements.forEach(el => {
@@ -45,6 +58,13 @@ class RecipeFinder {
             el.style.visibility = 'visible';
             el.classList.remove('hidden');
         });
+
+        // Ensure loading overlay is removed
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+            setTimeout(() => loadingOverlay.remove(), 300);
+        }
     }
 
     initEventListeners() {
