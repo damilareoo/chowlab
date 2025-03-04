@@ -6,15 +6,25 @@
     <title>ChowLab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-icon"></div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+            <div class="loading-percentage">0%</div>
+        </div>
+    </div>
+
     <div class="app-container">
         <header>
             <div class="logo">
-                <h1>ChowLab</h1>
+                <img src="./images/Chef Hat Minimalistic.svg" alt="ChowLab Logo" class="logo-image">
             </div>
             <nav>
                 <div class="photo-cta">
@@ -29,8 +39,8 @@
         <main>
             <section class="hero-section">
                 <div class="hero-content">
-                    <h2>Discover Delicious Recipes From Around The World</h2>
-                    <p>Your one-stop destination for exploring global cuisines, finding new recipes, and creating unforgettable culinary experiences.</p>
+                    <h2>Discover Global Flavors</h2>
+                    <p>Explore culinary treasures from around the world. Quick, easy, and delicious recipes at your fingertips.</p>
                 </div>
             </section>
 
@@ -70,6 +80,38 @@
         </footer>
     </div>
 
+    <script>
+        // Loading Screen Script
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.querySelector('.loading-screen');
+            const progressBar = document.querySelector('.loading-progress-bar');
+            const percentageDisplay = document.querySelector('.loading-percentage');
+
+            function updateProgress(progress) {
+                progressBar.style.width = `${progress}%`;
+                percentageDisplay.textContent = `${Math.round(progress)}%`;
+            }
+
+            function simulateLoading() {
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 20;
+                    if (progress > 100) progress = 100;
+                    
+                    updateProgress(progress);
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            loadingScreen.classList.add('hidden');
+                        }, 500);
+                    }
+                }, 300);
+            }
+
+            simulateLoading();
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
